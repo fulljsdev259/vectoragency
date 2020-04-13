@@ -13,6 +13,7 @@ export default function AddMeeting(props) {
     currentTime: moment().format("hh:mm A"),
   });
   const meeting = useSelector((state) => state.meetings.data);
+  console.log(meeting);
 
   //pushing to meetings page if page get refreshed and no data in reducer.
   useEffect(() => {
@@ -34,27 +35,45 @@ export default function AddMeeting(props) {
       alert("Meeting slot is not available");
     } else {
       alert("Meeting has added successfully.");
-    }   
+    }
   }
 
   //checking the meeting slot from pre sheduled meetings for the date.
   function handleCheckSlot() {
-    let startTime = moment(state.startTime, "hh:mm A"),
-      time = (time) => moment(time, ["HH:mm"]).format("HH:mm A");
-
-    const availableStartTime = meeting.filter((meeting) =>
-      startTime.isSame(moment(time(meeting.start_time), "hh:mm A"))
-    );
-    if (availableStartTime.length) {
+    let isStartTimeInPreSlots = handleCheckInPreSlots(state.startTime),
+      isEndTimeInPreSlots = handleCheckInPreSlots(state.endTime);
+    if (isStartTimeInPreSlots || isEndTimeInPreSlots) {
       return true;
     } else {
       return false;
     }
   }
 
+  function handleCheckInPreSlots(timeToCheckInSlots) {
+    const isTimeInPreSlots = (requestTime, scheduledSlots) => {
+      return scheduledSlots.some((slot) => {
+        return (
+          requestTime >= moment(slot[0], "HH:mm A") &&
+          requestTime <= moment(slot[1], "HH:mm A")
+        );
+      });
+    };
+    let time;
+
+    for (let i = 0; i < meeting.length; i++) {
+      time = isTimeInPreSlots(moment(timeToCheckInSlots, "HH:mm A"), [
+        [meeting[i].start_time, meeting[i].end_time],
+      ]);
+      if (time) {
+        break;
+      }
+    }
+    return time;
+  }
+
   return (
     <>
-      <Header heading='Add Meeting'/>
+      <Header heading="Add Meeting" />
       <div className="add-meeting container">
         <div onClick={handleAddMeeting} className={`add-meeting-btn `}>
           <div>Save</div>{" "}
