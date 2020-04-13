@@ -23,9 +23,10 @@ export default function AddMeeting(props) {
   function handleAddMeeting() {
     let startTime = moment(state.startTime, "hh:mm A"),
       endTime = moment(state.endTime, "hh:mm A"),
-      currentTime = moment(state.currentTime, "hh:mm A");
+      currentTime = moment(state.currentTime, "hh:mm A"),
+      isToday = moment(state.meetingDate).isSame(moment(), 'day');
 
-    if (startTime.isBefore(currentTime) || endTime.isBefore(currentTime)) {
+    if (isToday && (startTime.isBefore(currentTime) || endTime.isBefore(currentTime))) {
       alert("Meeting's slot time can not be less than current time.");
     } else if (endTime.isBefore(startTime) || startTime.isSame(endTime)) {
       alert("Meeting's End time can not be less than Start time or same as Start time.");
@@ -33,7 +34,7 @@ export default function AddMeeting(props) {
       alert("Meeting slot is not available");
     } else {
       alert("Meeting has added successfully.");
-    }
+    }   
   }
 
   //checking the meeting slot from pre sheduled meetings for the date.
