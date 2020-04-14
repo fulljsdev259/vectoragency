@@ -13,7 +13,6 @@ export default function AddMeeting(props) {
     currentTime: moment().format("hh:mm A"),
   });
   const meeting = useSelector((state) => state.meetings.data);
-  console.log(meeting);
 
   //pushing to meetings page if page get refreshed and no data in reducer.
   useEffect(() => {
@@ -40,8 +39,8 @@ export default function AddMeeting(props) {
 
   //checking the meeting slot from pre sheduled meetings for the date.
   function handleCheckSlot() {
-    let isStartTimeInPreSlots = handleCheckInPreSlots(state.startTime),
-      isEndTimeInPreSlots = handleCheckInPreSlots(state.endTime);
+    let isStartTimeInPreSlots = handleCheckInPreSlots(state.startTime, true),
+      isEndTimeInPreSlots = handleCheckInPreSlots(state.endTime, false);
     if (isStartTimeInPreSlots || isEndTimeInPreSlots) {
       return true;
     } else {
@@ -49,13 +48,22 @@ export default function AddMeeting(props) {
     }
   }
 
-  function handleCheckInPreSlots(timeToCheckInSlots) {
+  function handleCheckInPreSlots(timeToCheckInSlots, action) {
+    const endTime = moment(state.endTime, "hh:mm A");
     const isTimeInPreSlots = (requestTime, scheduledSlots) => {
       return scheduledSlots.some((slot) => {
-        return (
-          requestTime >= moment(slot[0], "HH:mm A") &&
-          requestTime <= moment(slot[1], "HH:mm A")
-        );
+        if (action && requestTime.isBefore(moment(slot[0], "HH:mm A"))) {
+          if (endTime.isBefore(moment(slot[0], "HH:mm A"))) {
+            return false;
+          } else {
+            return true;
+          }
+        } else {
+          return (
+            requestTime >= moment(slot[0], "HH:mm A") &&
+            requestTime <= moment(slot[1], "HH:mm A")
+          );
+        }
       });
     };
     let time;
