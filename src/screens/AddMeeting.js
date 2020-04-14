@@ -6,8 +6,9 @@ import moment from "moment";
 import { useSelector } from "react-redux";
 
 export default function AddMeeting(props) {
+  const {state:params} = props.location;
   const [state, setState] = useState({
-    meetingDate: moment(new Date(props.location.state.meetingsDate)).toDate(),
+    meetingDate: moment(new Date(params && params.meetingsDate)).toDate(),
     startTime: moment().format("hh:mm A"),
     endTime: moment().format("hh:mm A"),
     currentTime: moment().format("hh:mm A"),
